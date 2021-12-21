@@ -32,6 +32,12 @@ let combinations = [
   [3, 3, 3],
 ];
 
+let combinationCounts = new Map();
+for (const c of combinations) {
+  const sum = c[0] + c[1] + c[2];
+  combinationCounts.set(sum, (combinationCounts.get(sum) ?? 0) + 1);
+}
+
 let wins = new Map();
 
 function count(p1, p2, s1, s2) {
@@ -43,13 +49,14 @@ function count(p1, p2, s1, s2) {
   if (cached != null) return cached;
 
   let res = [0, 0];
-  for (const rolls of combinations) {
-    let n1 = p1 + rolls[0] + rolls[1] + rolls[2];
+
+  for (const [sum, cnt] of combinationCounts.entries()) {
+    let n1 = p1 + sum;
     n1 = ((n1 - 1) % 10) + 1;
     let ns1 = s1 + n1;
     let w = count(p2, n1, s2, ns1);
-    res[0] += w[1];
-    res[1] += w[0];
+    res[0] += w[1] * cnt;
+    res[1] += w[0] * cnt;
   }
 
   wins.set(key, res); // memoize result
